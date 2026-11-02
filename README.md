@@ -10,6 +10,16 @@ Void Linux / Gentoo + mangowm setup, Tokyo Night theme.
 | `foot/`  | terminal (`foot.ini`)          |
 | `rofi/`  | launcher (`config.rasi`)       |
 
+## Screenshots
+
+![waybar](screenshots/waybar.png)
+
+| Rofi | Mako |
+| ---- | ---- |
+| ![rofi](screenshots/rofi.png) | ![mako](screenshots/mako.png) |
+
+![foot](screenshots/foot.png)
+
 ## Install
 
 ```sh
@@ -79,3 +89,27 @@ here. Setting custom flags may mean waybar compiles instead of using the binhost
 ```sh
 echo "gui-apps/waybar mpris pulseaudio wifi tray" >> /etc/portage/package.use/waybar
 ```
+
+### Gentoo logo
+
+The bar uses the Void logo by default. On Gentoo, change the `custom/void`
+block in `waybar/config.jsonc` so the format uses the Gentoo glyph (`\uf30d`)
+instead of the Void one (`\uf32e`):
+
+```jsonc
+"custom/void": {
+  "format": "\uf30d",
+  "tooltip": false,
+  "on-click": "rofi -show drun",
+  "on-click-right": "foot"
+},
+```
+
+Or do it in one line:
+
+```sh
+sed -i 's/\\uf32e/\\uf30d/' ~/.config/waybar/config.jsonc
+```
+
+Restart waybar afterwards. Both glyphs come from the Nerd Font, so no extra
+font is needed.
