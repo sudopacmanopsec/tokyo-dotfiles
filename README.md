@@ -24,8 +24,8 @@ Each dir is copied into
 ## Dependencies
 
 ```sh
-sudo xbps-install -S waybar mako foot rofi playerctl pamixer pavucontrol
+sudo xbps-install -S waybar mako foot rofi playerctl pamixer pavucontrol font-iosevka
 ```
 
 Needs waybar 0.14+ for the `ext/workspaces` module, and a Nerd Font
-(JetBrainsMono Nerd Font Propo).
+(JetBrainsMono Nerd Font Propo for waybar and rofi), plus Iosevka for foot.
