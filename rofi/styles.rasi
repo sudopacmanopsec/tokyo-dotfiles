@@ -77,9 +77,10 @@ textbox-prompt-colon {
 }
 
 entry {
-  placeholder:       "Search…";
+  placeholder:       " Search…";
   placeholder-color: @muted;
   text-color:        @fg;
+  cursor-color:      @accent;
 }
 
 /* ---------- results ---------- */
@@ -106,24 +107,27 @@ element-icon {
 element-text {
   text-color:     inherit;
   vertical-align: 0.5;
-  highlight:      bold #bb9af7;
+  highlight:      inherit;
 }
 
 element normal.normal,
 element alternate.normal {
   background-color: transparent;
   text-color:       @fg;
+  highlight:        bold #bb9af7;
 }
 
 element selected.normal,
 element selected.active {
   background-color: @accent;
   text-color:       #1a1b26;
+  highlight:        bold underline #1a1b26;
 }
 
 element normal.active,
 element alternate.active {
   text-color: @accent-alt;
+  highlight:  bold #bb9af7;
 }
 
 element normal.urgent,
