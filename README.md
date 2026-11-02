@@ -10,13 +10,11 @@ Void Linux / Gentoo + mangowm setup, Tokyo Night theme.
 | `foot/`  | terminal (`foot.ini`)          |
 | `rofi/`  | launcher (`config.rasi`)       |
 
-## Screenshots
+## Pics
 
 ![waybar](screenshots/waybar.png)
 
-| Rofi | Mako |
-| ---- | ---- |
-| ![rofi](screenshots/rofi.png) | ![mako](screenshots/mako.png) |
+<img src="screenshots/rofi.png" alt="rofi" height="260"> <img src="screenshots/mako.png" alt="mako" height="260">
 
 ![foot](screenshots/foot.png)
 
