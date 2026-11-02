@@ -1,0 +1,28 @@
+font=Iosevka Nerd Font 11
+
+# Tokyo Night Dark Colors
+background-color=#1a1b2673
+text-color=#c0caf5
+progress-color=over #414868
+border-color=#7aa2f7
+border-size=2
+
+# Sharp corners (Not rounded)
+border-radius=0
+
+# Layout & Behavior
+width=360
+height=160
+padding=14
+margin=12
+outer-margin=6
+
+anchor=top-right
+layer=overlay
+icons=1
+max-icon-size=96
+icon-location=left
+icon-path=/usr/share/icons/Papirus
+default-timeout=6000
+ignore-timeout=0
+

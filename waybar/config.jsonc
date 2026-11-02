@@ -1,0 +1,177 @@
+{
+  "reload_style_on_change": true,
+  "layer": "top",
+  "position": "top",
+  "spacing": 0,
+  "height": 30,
+
+  "modules-left": ["custom/void", "ext/workspaces", "mpris", "custom/music-idle", "wlr/taskbar"],
+  "modules-center": [],
+  "modules-right": [
+    "tray",
+    "idle_inhibitor",
+    "cpu",
+    "memory",
+    "temperature",
+    "backlight",
+    "bluetooth",
+    "network",
+    "pulseaudio",
+    "battery",
+    "clock"
+  ],
+
+  // mangowm tags via ext-workspace (needs waybar 0.14+)
+  "ext/workspaces": {
+    "format": "{name}",
+    "ignore-hidden": false,
+    "sort-by-id": true,
+    "on-click": "activate",
+    "on-click-right": "deactivate"
+  },
+
+  // open windows as icons, click to focus
+  "wlr/taskbar": {
+    "format": "{icon}",
+    "icon-size": 16,
+    "tooltip-format": "{title}",
+    "on-click": "activate",
+    "on-click-middle": "close",
+    "ignore-list": []
+  },
+
+  // Void Linux logo (nf-linux-void)
+  "custom/void": {
+    "format": "\uf32e",
+    "tooltip": false,
+    "on-click": "fuzzel",
+    "on-click-right": "foot"
+  },
+
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": "\uf06e",
+      "deactivated": "\uf070"
+    },
+    "tooltip-format-activated": "Idle inhibited",
+    "tooltip-format-deactivated": "Idle allowed"
+  },
+
+  "cpu": {
+    "format": "\uf2db {usage}%",
+    "interval": 3,
+    "tooltip": false,
+    "on-click": "foot -e btop"
+  },
+
+  "memory": {
+    "format": "\uDB80\uDF5B {used:0.1f}G",
+    "interval": 5,
+    "tooltip-format": "{used:0.1f}G / {total:0.1f}G used ({percentage}%)",
+    "on-click": "foot -e btop"
+  },
+
+  "temperature": {
+    "critical-threshold": 80,
+    "format": "\uf2c9 {temperatureC}\u00b0",
+    "interval": 5,
+    "tooltip": false
+  },
+
+  "backlight": {
+    "format": "\uf185 {percent}%",
+    "scroll-step": 5,
+    "tooltip": false
+  },
+
+  "clock": {
+    "format": "{:%I:%M %p}",
+    "format-alt": "{:%A %e %B}",
+    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+  },
+
+  "battery": {
+    "format": "{icon} {capacity}%",
+    "format-charging": "\uf0e7 {capacity}%",
+    "format-plugged": "\uf1e6 {capacity}%",
+    "format-full": "\uf240 {capacity}%",
+    "format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
+    "tooltip-format": "{timeTo}",
+    "interval": 10,
+    "states": {
+      "warning": 20,
+      "critical": 10
+    }
+  },
+
+  "network": {
+    "format-wifi": "\uf1eb",
+    "format-ethernet": "\uDB80\uDE00",
+    "format-disconnected": "\uf071",
+    "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{bandwidthDownBytes} down / {bandwidthUpBytes} up",
+    "tooltip-format-ethernet": "{ifname}\n{bandwidthDownBytes} down / {bandwidthUpBytes} up",
+    "tooltip-format-disconnected": "Disconnected",
+    "interval": 3
+  },
+
+  "bluetooth": {
+    "format": "\uf293",
+    "format-disabled": "",
+    "format-off": "",
+    "format-no-controller": "",
+    "format-connected": "\uf293",
+    "tooltip-format": "Devices connected: {num_connections}",
+    "on-click": "blueman-manager"
+  },
+
+  "pulseaudio": {
+    "format": "{icon}",
+    "format-muted": "\uf026",
+    "format-icons": {
+      "default": ["\uf027", "\uf027", "\uf028"]
+    },
+    "tooltip-format": "Volume {volume}%",
+    "scroll-step": 5,
+    "on-click": "pavucontrol",
+    "on-click-right": "pamixer -t"
+  },
+
+  "tray": {
+    "icon-size": 16,
+    "spacing": 8
+  },
+
+  // small music-note box, only shown when no player is running
+  "custom/music-idle": {
+      "exec": "playerctl status >/dev/null 2>&1 || echo '\uf001'",
+    "format": "{}",
+    "interval": 2,
+    "tooltip": false
+  },
+
+  "mpris": {
+    "interval": 10,
+    "format": "{player_icon} {dynamic}",
+    "format-paused": "{status_icon} {artist} - {title}",
+    "format-stopped": "\uf001",
+    "dynamic-order": ["artist", "title"],
+    "ignored-players": [],
+    "max-length": 40,
+    "on-click": "playerctl previous",
+    "on-click-middle": "playerctl play-pause",
+    "on-click-right": "playerctl next",
+    "tooltip": false,
+    "player-icons": {
+      "default": "\uf001",
+      "spotify": "\uf1bc",
+      "mpv": "\uf04b"
+    },
+    "status-icons": {
+      "paused": "\uf04c",
+      "playing": "\uf04b",
+      "stopped": "\uf04d"
+    }
+  }
+}
+
