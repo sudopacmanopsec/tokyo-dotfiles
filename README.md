@@ -18,7 +18,7 @@ cd ~/tokyo-dotfiles
 ./install.sh
 ```
 
-Existing configs are moved to `<name>.bak`, then each dir is symlinked into
+Each dir is copied into
 `~/.config`.
 
 ## Dependencies
