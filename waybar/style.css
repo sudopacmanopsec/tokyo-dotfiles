@@ -13,9 +13,11 @@
 @define-color yellow    #e0af68;
 @define-color red       #f7768e;
 
+/* Global typography */
 * {
   font-family: 'JetBrainsMono Nerd Font Propo';
   font-size: 12px;
+  font-weight: 400;
   border: none;
   border-radius: 0;
   min-height: 0;
@@ -23,6 +25,7 @@
   color: @fg;
 }
 
+/* Bar */
 window#waybar {
   background-color: alpha(@bg, 0.92);
   border-bottom: 1px solid @border;
@@ -31,9 +34,8 @@ window#waybar {
 .modules-left  { margin-left: 8px; }
 .modules-right { margin-right: 8px; }
 
-/* pill style shared by most modules */
-#custom-void,
-#workspaces,
+/* Shared module pills */
+#custom-gentoo,
 #mpris,
 #custom-music-idle,
 #tray,
@@ -41,11 +43,8 @@ window#waybar {
 #cpu,
 #memory,
 #temperature,
-#backlight,
-#bluetooth,
 #network,
 #pulseaudio,
-#battery,
 #clock {
   background-color: @surface;
   border: 1px solid @border;
@@ -54,58 +53,84 @@ window#waybar {
   padding: 0 8px;
 }
 
-/* void logo */
-#custom-void {
-  color: @blue;
+/* Gentoo logo */
+#custom-gentoo {
+  color: @purple;
   font-size: 14px;
   min-width: 18px;
-  border-bottom-color: @blue;
+  border-bottom-color: @purple;
 }
 
-#custom-void:hover {
+#custom-gentoo:hover {
   color: @fg-bright;
 }
 
-/* mangowm tags */
+/* Workspaces: connected individual pills */
 #workspaces {
-  padding: 0 2px;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  margin: 3px 2px;
 }
 
 #workspaces button {
   all: initial;
+  font-family: 'JetBrainsMono Nerd Font Propo';
+  font-size: 12px;
+  font-weight: 400;
   color: @muted;
-  padding: 0 7px;
-  margin: 0 1px;
+  background-color: @surface;
+  border: 1px solid @border;
+  border-bottom: 2px solid @muted;
+  padding: 0 10px;
+  margin: 0;
   min-width: 10px;
-  border-bottom: 2px solid transparent;
   transition: all 90ms ease-in-out;
 }
 
-#workspaces button:hover {
-  color: @fg-bright;
+/* Join the pills without doubled borders */
+#workspaces button + button {
+  border-left: none;
 }
 
+/* Active workspace */
 #workspaces button.active {
   color: @fg-bright;
+  background-color: #25263a;
   border-bottom: 2px solid @blue;
 }
 
+/* Urgent workspace */
 #workspaces button.urgent {
   color: @red;
   border-bottom: 2px solid @red;
 }
 
+/* Hidden workspace */
 #workspaces button.hidden {
-  opacity: 0.4;
+  color: @muted;
 }
 
-/* open windows in the centre */
+/* Individual app pills */
+#taskbar {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
 #taskbar button {
   all: initial;
+  font-family: 'JetBrainsMono Nerd Font Propo';
+  font-size: 12px;
+  font-weight: 400;
+  color: @fg;
+  background-color: @surface;
+  border: 1px solid @border;
+  border-bottom: 2px solid @muted;
   padding: 0 8px;
-  margin: 3px 1px;
-  border-bottom: 2px solid transparent;
-  opacity: 0.6;
+  margin: 3px 2px;
+  opacity: 0.65;
   transition: all 90ms ease-in-out;
 }
 
@@ -115,47 +140,53 @@ window#waybar {
 
 #taskbar button.active {
   opacity: 1;
-  border-bottom: 2px solid @blue;
+  border-bottom-color: @blue;
 }
 
-/* media */
-#mpris.paused,
-#mpris.stopped {
+/* Media */
+#custom-music {
+  background-color: @surface;
+  border: 1px solid @border;
+  border-bottom: 2px solid @muted;
+  margin: 3px 2px;
+  padding: 0 8px;
+  color: @fg;
+}
+
+#custom-music.idle {
   color: @muted;
 }
 
-#custom-music-idle {
+#custom-music.paused {
   color: @muted;
-  min-width: 18px;
 }
 
-/* system modules */
+#custom-music.playing {
+  color: @fg;
+}
+
+/* System modules */
 #idle_inhibitor { color: @muted; }
 #idle_inhibitor.activated { color: @green; }
 #cpu          { color: @cyan; }
 #memory       { color: @blue; }
 #temperature  { color: @fg; }
 #temperature.critical { color: @red; }
-#backlight    { color: @yellow; }
 
-/* connectivity / power */
-#bluetooth    { color: @blue; }
+/* Connectivity and audio */
 #network      { color: @cyan; }
 #network.disconnected { color: @red; }
 #pulseaudio   { color: @purple; }
 #pulseaudio.muted { color: @muted; }
 
-#battery          { color: @fg; }
-#battery.charging { color: @green; }
-#battery.warning:not(.charging)  { color: @yellow; }
-#battery.critical:not(.charging) { color: @red; }
-
+/* Clock */
 #clock {
   color: @fg-bright;
   font-weight: 600;
   border-bottom-color: @purple;
 }
 
+/* Tooltips */
 tooltip {
   background-color: @bg;
   border: 1px solid @muted;
@@ -163,5 +194,7 @@ tooltip {
 }
 
 tooltip label {
+  font-family: 'JetBrainsMono Nerd Font Propo';
+  font-size: 12px;
   color: @fg;
 }
