@@ -1,7 +1,5 @@
-font=Iosevka Nerd Font 11
-
 # Tokyo Night Dark Colors
-background-color=#1a1b2673
+background-color=#1a1b26
 text-color=#c0caf5
 progress-color=over #414868
 border-color=#7aa2f7
@@ -11,6 +9,7 @@ border-size=2
 border-radius=0
 
 # Layout & Behavior
+font=iosevka 11
 width=360
 height=160
 padding=14
