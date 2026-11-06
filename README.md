@@ -27,7 +27,6 @@ mangowm + Tokyo Night. Waybar, mako, rofi, foot and zsh, this is a personal repo
 git clone https://github.com/sudopacmanopsec/tokyo-dotfiles.git ~/tokyo-dotfiles
 cd ~/tokyo-dotfiles
 ./install.sh
-cp zsh/.zshrc ~/.zshrc
 ```
 
 `install.sh` copies each folder into `~/.config` and keeps a numbered backup
