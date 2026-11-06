@@ -1,6 +1,6 @@
 # tokyo-dotfiles
 
-mangowm + Tokyo Night. Waybar, mako, rofi, foot and zsh.
+mangowm + Tokyo Night. Waybar, mako, rofi, foot and zsh, this is a personal repo, use if you wish, but it might be broken for you lol
 
 ## Pics
 
