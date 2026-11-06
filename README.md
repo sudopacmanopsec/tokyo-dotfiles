@@ -58,11 +58,6 @@ the manual `cp` line above. **Read "Before you install" first.**
 | Nerd Font symbols       | icon glyphs in the bar, rofi and foot       |
 | Papirus icon theme      | rofi icons                                  |
 
-### Optional
-
-fastfetch (the `ff` alias), btop (click action on the CPU and RAM pills),
-blueman (bluetooth pill click action, only if you have bluetooth).
-
 ### Gentoo
 
 Use the official binhost so most of this installs prebuilt. Newer stage3s
@@ -104,13 +99,11 @@ rely on them: `media-sound/playerctl`, `media-sound/pavucontrol`,
 
 - A running D-Bus session and a PipeWire or PulseAudio server (mako and the
   volume module need both).
-- mangowm is not in the main repos. Build it from source (wlroots 0.19 and
-  scenefx first) using the mangowm installation wiki.
-
+- mangowm is in the non-free repo, so enable that pls
 ```sh
 sudo xbps-install -S waybar mako foot rofi playerctl pavucontrol libnotify \
   grim slurp zsh starship zsh-syntax-highlighting zsh-autosuggestions \
-  papirus-icon-theme fastfetch btop font-iosevka
+  papirus-icon-theme fastfetch btop font-iosevka mangowc
 ```
 
 JetBrains Mono and the Nerd Font symbols are not in that list. Check
