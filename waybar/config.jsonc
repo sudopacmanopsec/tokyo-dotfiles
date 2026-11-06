@@ -26,7 +26,7 @@
 
 "ext/workspaces": {
   "format": "{name}",
-  "ignore-hidden": true,
+  "ignore-hidden": false,
   "sort-by-id": true,
   "on-click": "activate",
   "on-click-right": "deactivate"
