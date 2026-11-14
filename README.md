@@ -4,11 +4,11 @@ mangowm + Tokyo Night. Waybar, mako, rofi, foot and zsh, this is a personal repo
 
 ## Pics
 
-![waybar](screenshots/waybar-real.png)
+![waybar](screenshots/bar.png)
 
-<img src="screenshots/rofi-real.png" alt="rofi" height="300">
+<img src="screenshots/Rofi.png" alt="rofi" height="300">
 
-![full](screenshots/full-real.png)
+![full](screenshots/full.png)
 
 ## What's in here
 
