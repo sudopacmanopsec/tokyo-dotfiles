@@ -19,7 +19,6 @@ mangowm + Tokyo Night. Waybar, mako, rofi, foot and zsh, this is a personal repo
 | `mango/` | mangowm (`config.conf`, binds, autostart) |
 | `foot/`  | terminal (`foot.ini`)                 |
 | `rofi/`  | launcher (`styles.rasi`, scripts)     |
-| `zsh/`   | `.zshrc`                              |
 
 ## Install
 
