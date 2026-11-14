@@ -1,0 +1,32 @@
+#!/bin/sh
+# Screenshot helper for wlroots-style compositors (mango).
+# Usage: screenshot [full|area|clip]
+#   full  whole screen -> file + clipboard + notification
+#   area  select a region -> file + clipboard + notification
+#   clip  select a region -> clipboard only (+ notification)
+# Needs: grim, slurp, wl-clipboard, libnotify
+
+DIR=${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots
+mkdir -p "$DIR"
+F="$DIR/$(date +%Y-%m-%d_%H-%M-%S).png"
+
+case "${1:-full}" in
+  clip)
+    geo=$(slurp) || exit 0
+    grim -g "$geo" - | wl-copy --type image/png \
+      && notify-send "Screenshot copied" "Region copied to clipboard"
+    exit 0 ;;
+  area)
+    geo=$(slurp) || exit 0          # cancelled selection: do nothing
+    grim -g "$geo" "$F" ;;
+  *)
+    grim "$F" ;;
+esac
+
+if [ ! -s "$F" ]; then
+  notify-send -u critical "Screenshot failed" "grim did not produce an image"
+  exit 1
+fi
+
+wl-copy --type image/png < "$F"
+notify-send -i "$F" "Screenshot saved" "$F"

@@ -1,0 +1,37 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = true
+
+format = """
+$directory$git_branch$git_status$cmd_duration
+$jobs$character"""
+
+[character]
+success_symbol = "[✦](bold #7aa2f7) [❯](#bb9af7)"
+error_symbol   = "[✦](bold #f7768e) [❯](#f7768e)"
+
+[directory]
+style = "bold #7aa2f7"
+truncation_length = 3
+truncate_to_repo = true
+read_only = " ro"
+format = "[$path]($style)[$read_only](#f7768e) "
+
+[git_branch]
+symbol = ""
+style = "#bb9af7"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+style = "#e0af68"
+format = "([$all_status$ahead_behind]($style) )"
+
+[cmd_duration]
+min_time = 2000
+style = "#565f89"
+format = "[$duration]($style)"
+
+[jobs]
+symbol = ""
+number_threshold = 1
+format = "[+$number](#e0af68) "
