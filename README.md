@@ -1,6 +1,6 @@
 # tokyo-dotfiles
 
-mangowm + Tokyo Night. Waybar, mako, rofi, foot and zsh, this is a personal repo, use if you wish, but it might be broken for you lol
+mangowm + Tokyo Night. Waybar, mako, rofi, and foot, this is a personal repo, use if you wish, but it might be broken for you lol
 
 ## Pics
 
@@ -46,11 +46,8 @@ the manual `cp` line above. **Read "Before you install" first.**
 | playerctl               | media pill and its click actions            |
 | pavucontrol             | volume click action                         |
 | PipeWire or PulseAudio  | provides `pactl` for the volume module      |
-| libnotify               | `notify-send`, for testing mako             |
 | grim, slurp             | screenshots                                 |
 | zsh, starship           | shell and prompt                            |
-| zsh-syntax-highlighting | loaded by `.zshrc`                          |
-| zsh-autosuggestions     | loaded by `.zshrc` (or cloned to `~/.zsh/`) |
 | JetBrains Mono          | waybar and rofi                             |
 | Iosevka                 | foot                                        |
 | Nerd Font symbols       | icon glyphs in the bar, rofi and foot       |
