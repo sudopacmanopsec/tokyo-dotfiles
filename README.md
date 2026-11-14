@@ -10,6 +10,8 @@ mangowm + Tokyo Night. Waybar, mako, rofi, and foot, this is a personal repo, us
 
 ![full](screenshots/full.png)
 
+![Mako](screenshots/mako.png)
+
 ## What's in here
 
 | Dir      | App                                   |
