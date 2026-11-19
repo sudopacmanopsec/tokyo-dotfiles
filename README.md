@@ -1,6 +1,6 @@
 # tokyo-dotfiles
 
-mangowm + Tokyo Night. Waybar, mako, rofi, and foot, this is a personal repo, use if you wish, but it might be broken for you lol
+mangowm + Tokyo Night. Waybar, mako, rofi, and foot, this is a personal repo, use if you wish, but it might be broken for you lol. btw the apps on waybar are active apps, not pinned, click on them and go to them!, also read the files and see what they do, SUPER+scroll allows you to change your workspaces
 
 ## Pics
 
