@@ -1,0 +1,344 @@
+#!/usr/bin/env python3
+"""keyview - system-wide keystroke overlay for wlroots compositors (mangowm).
+
+Shows your last 2 keystrokes top-right. Repeating the same key/combo shows a small
+"2x", "3x" badge on the bottom-right of that chip. Reads /dev/input directly (needs
+the `input` group), so it works in every app and the TTY-less Wayland session.
+It only displays keys; nothing is logged or stored.
+
+  keyview --print        # no GUI: print what it sees, to check input access works
+  keyview                # the overlay
+  pkill -USR1 -f keyview # toggle on/off (hide it before typing passwords!)
+
+Deps for the overlay: python-gobject, gtk4, gtk4-layer-shell (+ its typelib),
+optionally python-cairo (makes the overlay click-through).
+"""
+import argparse
+import glob
+import os
+import re
+import signal
+import struct
+import sys
+import time
+
+EVENT_FMT = "llHHi"  # struct input_event on 64-bit Linux
+EVENT_SIZE = struct.calcsize(EVENT_FMT)
+EV_KEY = 1
+
+# ---- key tables (evdev codes, US layout) ----
+KEYS = {1: "⎋", 14: "⌫", 15: "⇥", 28: "⏎", 57: "␣", 58: "⇪",
+        102: "Home", 103: "↑", 104: "⇞", 105: "←", 106: "→",
+        107: "End", 108: "↓", 109: "⇟", 110: "Ins", 111: "⌦"}
+for i, ch in enumerate("1234567890-="):
+    KEYS[2 + i] = ch
+for i, ch in enumerate("qwertyuiop[]"):
+    KEYS[16 + i] = ch
+for i, ch in enumerate("asdfghjkl;'`"):
+    KEYS[30 + i] = ch
+KEYS[43] = "\\"
+KEYS[86] = "\\"
+for i, ch in enumerate("zxcvbnm,./"):
+    KEYS[44 + i] = ch
+for i in range(10):
+    KEYS[59 + i] = f"F{i + 1}"
+KEYS[87], KEYS[88] = "F11", "F12"
+
+SHIFT_US = dict(zip("1234567890-=[];'`\\,./", '!@#$%^&*()_+{}:"~|<>?'))
+SHIFT_UK = dict(SHIFT_US, **{"2": '"', "3": "£", "'": "@", "`": "¬", "\\": "|"})
+KEYS[43] = "#"  # UK extra key; harmless on US boards (code never sent)
+SHIFT_UK["#"] = "~"
+
+SPECIAL = set("⎋⌫⇥⏎⇪⌦←↑→↓⇞⇟")  # single-glyph keys that are NOT part of typed text
+
+MODS = {29: "Ctrl", 97: "Ctrl", 56: "Alt", 100: "Alt", 125: "Super", 126: "Super",
+        42: "Shift", 54: "Shift"}
+MOD_ORDER = ["Ctrl", "Alt", "Super", "Shift"]
+# U+F17C is the Linux (tux) glyph in Nerd Fonts; swap it for "⌘" or "Super" if you prefer
+MOD_SYMBOLS = {"Ctrl": "⌃", "Alt": "⌥", "Super": "", "Shift": "⇧"}
+
+
+class KeyLog:
+    """Turns raw key events into the (at most 2) chips shown on screen."""
+
+    def __init__(self, layout="us", timeout=2.5, max_items=3, max_chars=16, symbols=True):
+        self.symbols = symbols       # modifiers as glyphs instead of "Ctrl+" words
+        self.shift_map = SHIFT_UK if layout == "uk" else SHIFT_US
+        self.timeout = timeout
+        self.max_items = max_items   # tokens on screen; a typed run of text is ONE token
+        self.max_chars = max_chars   # longest typed run shown
+        self.held = {}          # code -> modifier name (so L+R of same mod work)
+        self.items = []         # [label, count, is_text]
+        self.last = 0.0
+
+    def _mods(self):
+        return {m for m in self.held.values()}
+
+    def label(self, code):
+        base = KEYS.get(code)
+        if base is None:
+            return None
+        mods = self._mods()
+        shift = "Shift" in mods
+        others = [m for m in MOD_ORDER if m in mods and m != "Shift"]
+        single = len(base) == 1
+        if others:  # combo: Ctrl+C, Super+Shift+Return ...
+            key = base
+            parts = others + (["Shift"] if shift else [])
+            if self.symbols:   # ⌃u  ⌥⇧⏎  <tux>⇧s
+                return "".join(MOD_SYMBOLS[p] for p in parts) + key
+            return "+".join(parts + [key])
+        if shift:
+            if single and base.isalpha():
+                return base.upper()
+            if base in self.shift_map:
+                return self.shift_map[base]
+            return (MOD_SYMBOLS["Shift"] if self.symbols else "Shift+") + base
+        return base
+
+    def event(self, code, value, now=None):
+        """Feed one EV_KEY event. Returns True if the display changed."""
+        now = time.monotonic() if now is None else now
+        if code in MODS:
+            if value:
+                self.held[code] = MODS[code]
+            else:
+                self.held.pop(code, None)
+            return False
+        if value not in (1, 2):  # 1 = press, 2 = held (auto-repeat) -> counts up; 0 = release
+            return False
+        lab = self.label(code)
+        if lab is None:
+            return False
+        is_text = (not any(m != "Shift" for m in self._mods())
+                   and len(lab) == 1 and lab not in SPECIAL)
+        if is_text:
+            if self.items and self.items[-1][2]:   # keep typing: extend the run, like text
+                run = self.items[-1][0]            # run = [[char, repeat_count], ...]
+                if run[-1][0] == lab:
+                    run[-1][1] += 1
+                else:
+                    run.append([lab, 1])
+                    del run[:-self.max_chars]
+            else:
+                self.items.append([[[lab, 1]], 1, True])
+        elif self.items and not self.items[-1][2] and self.items[-1][0] == lab:
+            self.items[-1][1] += 1                 # same combo again: 2x, 3x ...
+        else:
+            self.items.append([lab, 1, False])
+        self.items = self.items[-self.max_items:]
+        self.last = now
+        return True
+
+    def visible(self, now=None):
+        now = time.monotonic() if now is None else now
+        if self.items and now - self.last > self.timeout:
+            self.items = []
+        return [tuple(i) for i in self.items]
+
+
+# ---- device discovery ----
+def find_keyboards():
+    """event device paths for real keyboards (have EV_KEY + EV_REP, kbd handler)."""
+    paths = []
+    try:
+        text = open("/proc/bus/input/devices").read()
+    except OSError:
+        return paths
+    for block in text.strip().split("\n\n"):
+        h = re.search(r"^H: Handlers=(.*)$", block, re.M)
+        ev = re.search(r"^B: EV=([0-9a-fA-F]+)$", block, re.M)
+        if not h or not ev:
+            continue
+        handlers = h.group(1).split()
+        mask = int(ev.group(1), 16)
+        if "kbd" in handlers and mask & (1 << 1) and mask & (1 << 20):
+            paths += ["/dev/input/" + x for x in handlers if x.startswith("event")]
+    return paths
+
+
+def drain(fd, log, on_change):
+    """Read all pending events from fd. Returns False if the device went away."""
+    try:
+        data = os.read(fd, EVENT_SIZE * 64)
+    except BlockingIOError:
+        return True
+    except OSError:
+        return False
+    if not data:
+        return False
+    for off in range(0, len(data) - EVENT_SIZE + 1, EVENT_SIZE):
+        _, _, etype, code, value = struct.unpack_from(EVENT_FMT, data, off)
+        if etype == EV_KEY and log.event(code, value):
+            on_change()
+    return True
+
+
+# ---- modes ----
+def run_print(args):
+    import select
+    log = KeyLog(args.layout, args.timeout, args.tokens, args.chars, args.mods == "symbols")
+    fds = {}
+    for p in find_keyboards():
+        try:
+            fds[os.open(p, os.O_RDONLY | os.O_NONBLOCK)] = p
+        except OSError as e:
+            print(f"cannot open {p}: {e} (are you in the 'input' group? re-login after adding)", file=sys.stderr)
+    if not fds:
+        sys.exit("no readable keyboard devices found")
+    print("watching:", ", ".join(fds.values()), "- Ctrl+C in this terminal to quit")
+    while True:
+        ready, _, _ = select.select(list(fds), [], [])
+        for fd in ready:
+            drain(fd, log, lambda: print(log.visible()))
+
+
+def ensure_preload():
+    """gtk4-layer-shell must be loaded before libwayland-client; re-exec with LD_PRELOAD."""
+    if os.environ.get("KEYVIEW_REEXEC"):
+        return
+    libs = []
+    for pat in ("/usr/lib*/libgtk4-layer-shell.so*", "/usr/lib/*/libgtk4-layer-shell.so*"):
+        libs = sorted(glob.glob(pat))
+        if libs:
+            break
+    if not libs:
+        return
+    pre = os.environ.get("LD_PRELOAD", "")
+    os.environ["LD_PRELOAD"] = (pre + " " + libs[0]).strip()
+    os.environ["KEYVIEW_REEXEC"] = "1"
+    os.execv(sys.executable, [sys.executable] + sys.argv)
+
+
+def run_overlay(args):
+    ensure_preload()
+    import gi
+    gi.require_version("Gtk", "4.0")
+    gi.require_version("Gtk4LayerShell", "1.0")
+    from gi.repository import Gtk, Gdk, GLib, Gtk4LayerShell as LS
+
+    log = KeyLog(args.layout, args.timeout, args.tokens, args.chars, args.mods == "symbols")
+    state = {"enabled": True, "fds": {}}
+
+    css = f"""
+    window.keyview {{ background: transparent; }}
+    .panel {{ background: alpha(#16161e, 0.94); border: 1px solid #292e42;
+              border-radius: 0; padding: 3px 9px 4px 9px; color: #a9b1d6;
+              font-family: "{args.font}", sans-serif; font-size: {args.size}px; }}
+    """
+
+    def activate(app):
+        prov = Gtk.CssProvider()
+        prov.load_from_string(css) if hasattr(prov, "load_from_string") else prov.load_from_data(css.encode())
+        Gtk.StyleContext.add_provider_for_display(
+            Gdk.Display.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
+        win = Gtk.Window(application=app)
+        win.add_css_class("keyview")
+        LS.init_for_window(win)
+        LS.set_layer(win, LS.Layer.OVERLAY)
+        LS.set_namespace(win, "keyview")
+        LS.set_keyboard_mode(win, LS.KeyboardMode.NONE)
+        LS.set_anchor(win, LS.Edge.TOP, True)
+        LS.set_anchor(win, LS.Edge.RIGHT, True)
+        LS.set_margin(win, LS.Edge.TOP, args.margin)
+        LS.set_margin(win, LS.Edge.RIGHT, args.margin)
+
+        box = Gtk.Label()           # ONE label = one flowing line of text, like a status line
+        box.add_css_class("panel")  # square corners, 1px border
+        win.set_child(box)
+
+        def click_through(w):
+            try:
+                import cairo
+                w.get_surface().set_input_region(cairo.Region())
+            except Exception:
+                pass
+        win.connect("map", click_through)
+
+        def render():
+            items = log.visible() if state["enabled"] else []
+            if not items:
+                win.set_visible(False)
+                return
+            def badge(n):  # small, underlined, sunk below the baseline, same colour as the text
+                return f'<span size="x-small" underline="single" rise="-2500">{n}×</span>'
+
+            parts = []
+            for lab, count, is_text in items:
+                if is_text:  # typed run: a char hit N+ times in a row collapses to  k5×
+                    s = "".join(GLib.markup_escape_text(ch) * n if n < args.collapse
+                                else GLib.markup_escape_text(ch) + badge(n)
+                                for ch, n in lab)
+                else:
+                    s = GLib.markup_escape_text(lab) + (badge(count) if count > 1 else "")
+                parts.append(s)
+            box.set_markup(" ".join(parts))
+            win.set_visible(True)
+
+        def scan():
+            for p in find_keyboards():
+                if p in state["fds"].values():
+                    continue
+                try:
+                    fd = os.open(p, os.O_RDONLY | os.O_NONBLOCK)
+                except OSError:
+                    continue
+                state["fds"][fd] = p
+
+                def cb(fd_, cond, fd=fd):
+                    ok = cond == GLib.IOCondition.IN and drain(fd, log, render)
+                    if not ok:
+                        state["fds"].pop(fd, None)
+                        try:
+                            os.close(fd)
+                        except OSError:
+                            pass
+                    return ok
+                GLib.io_add_watch(fd, GLib.PRIORITY_DEFAULT,
+                                  GLib.IOCondition.IN | GLib.IOCondition.HUP | GLib.IOCondition.ERR, cb)
+            return True
+
+        def tick():
+            if log.items and not log.visible():
+                render()
+            return True
+
+        def toggle():
+            state["enabled"] = not state["enabled"]
+            render()
+            return True
+
+        scan()
+        if not state["fds"]:
+            print("keyview: no readable keyboards (is your user in the 'input' group?)", file=sys.stderr)
+        GLib.timeout_add_seconds(5, scan)      # hotplug
+        GLib.timeout_add(150, tick)            # expire chips
+        GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGUSR1, toggle)
+
+    app = Gtk.Application(application_id="dev.keyview")
+    app.connect("activate", activate)
+    app.hold()
+    app.run(None)
+
+
+def main():
+    ap = argparse.ArgumentParser(description="system-wide keystroke overlay")
+    ap.add_argument("--print", action="store_true", help="no GUI, print keys to the terminal")
+    ap.add_argument("--layout", choices=["us", "uk"], default="us", help="for Shift+symbol labels")
+    ap.add_argument("--timeout", type=float, default=2.5, help="seconds before the box fades")
+    ap.add_argument("--tokens", type=int, default=3, help="max items shown (a typed run counts as one)")
+    ap.add_argument("--chars", type=int, default=16, help="max typed characters shown in a run")
+    ap.add_argument("--mods", choices=["symbols", "text"], default="symbols",
+                    help="show Ctrl/Alt/Super/Shift as glyphs (default) or words")
+    ap.add_argument("--collapse", type=int, default=3,
+                    help="same typed key this many times in a row shows as k3x instead of kkk")
+    ap.add_argument("--font", default="Iosevka Nerd Font Propo")
+    ap.add_argument("--size", type=int, default=15, help="text size in px")
+    ap.add_argument("--margin", type=int, default=16, help="gap from top-right corner")
+    args = ap.parse_args()
+    (run_print if args.print else run_overlay)(args)
+
+
+if __name__ == "__main__":
+    main()
