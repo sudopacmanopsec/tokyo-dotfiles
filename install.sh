@@ -1,6 +1,6 @@
 #!/bin/sh
 # Install these dotfiles: copy each config dir from this repo into ~/.config,
-# plus starship.toml and the helper scripts in bin/.
+# plus starship.toml, the helper scripts in bin/, and the keyview overlay.
 # An existing config dir is backed up first as <dir>.bak.<timestamp>.
 # Portable: works with GNU and BSD (Chimera) userlands.
 
@@ -43,6 +43,15 @@ if [ -d "$REPO/bin" ]; then
     chmod +x "$BINDIR/$(basename "$f")"
     echo "installed $(basename "$f") -> $BINDIR"
   done
+fi
+
+# keyview: system-wide keystroke overlay (autostarted from mango/autostart.conf)
+if [ -f "$REPO/keyview/keyview" ]; then
+  mkdir -p "$BINDIR"
+  cp "$REPO/keyview/keyview" "$BINDIR/keyview"
+  chmod +x "$BINDIR/keyview"
+  echo "installed keyview -> $BINDIR"
+  echo "  needs gtk4-layer-shell and your user in the 'input' group"
 fi
 
 # waybar scripts need to be executable

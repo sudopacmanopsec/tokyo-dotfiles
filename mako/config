@@ -9,7 +9,7 @@ border-size=2
 border-radius=0
 
 # Layout & Behavior
-font=iosevka 11
+font=iosevka nerd font propo 11
 width=360
 height=160
 padding=14
