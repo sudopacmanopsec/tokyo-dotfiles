@@ -40,7 +40,7 @@ the manual `cp` line above. **Read "Before you install" first.**
 
 ### Required
 
-| What                    | Why                                         |
+| What                    | reason                                      |
 | ----------------------- | ------------------------------------------- |
 | mangowm (+ wlroots 0.19, scenefx) | the compositor                    |
 | waybar **0.14+**        | needs the `ext/workspaces` module           |
@@ -51,63 +51,12 @@ the manual `cp` line above. **Read "Before you install" first.**
 | pavucontrol             | volume click action                         |
 | PipeWire or PulseAudio  | provides `pactl` for the volume module      |
 | grim, slurp             | screenshots                                 |
+| keyview                 | keyview lol                                 |
 | zsh, starship           | shell and prompt                            |
 | JetBrains Mono          | waybar and rofi                             |
 | Iosevka                 | foot                                        |
 | Nerd Font symbols       | icon glyphs in the bar, rofi and foot       |
 | Papirus icon theme      | rofi icons                                  |
-
-### Gentoo
-
-Use the official binhost so most of this installs prebuilt. Newer stage3s
-already have it in `/etc/portage/binrepos.conf/`. Add `getbinpkg` to
-`FEATURES` in `make.conf` if it is missing, then install with `--getbinpkg`.
-
-**Enable:**
-
-- The GURU overlay (`eselect repository enable guru`), for mangowm and
-  zsh-autosuggestions.
-- `~amd64` keywords for `gui-wm/mangowm`, `gui-libs/scenefx` and
-  `app-shells/zsh-autosuggestions` in `/etc/portage/package.accept_keywords/`.
-- The waybar USE flags for the modules used here. Check the exact names with
-  `equery uses gui-apps/waybar` (you want the mpris, pulseaudio, network and
-  tray support).
-
-```sh
-emerge -av --getbinpkg gui-apps/waybar gui-apps/mako gui-apps/foot \
-  x11-misc/rofi gui-apps/grim gui-apps/slurp media-fonts/jetbrains-mono \
-  media-fonts/iosevka media-fonts/symbols-nerd-font gui-wm/mangowm
-```
-
-These names are from memory, so confirm them with `eix <name>` before you
-rely on them: `media-sound/playerctl`, `media-sound/pavucontrol`,
-`x11-libs/libnotify`, `app-shells/zsh`, `app-shells/starship`,
-`app-shells/zsh-syntax-highlighting`, `x11-themes/papirus-icon-theme`,
-`app-misc/fastfetch`, `sys-process/btop`.
-
-**Don't install:**
-
-- `media-sound/pamixer`. It is only in GURU and is keyword-masked. The mute
-  action works with `pactl` instead.
-- The full `nerdfonts` package unless you want the exact patched font names.
-  The symbols font above covers the icons.
-
-### Void
-
-**Enable:**
-
-- A running D-Bus session and a PipeWire or PulseAudio server (mako and the
-  volume module need both).
-- mangowm is in the non-free repo, so enable that pls
-```sh
-sudo xbps-install -S waybar mako foot rofi playerctl pavucontrol libnotify \
-  grim slurp zsh starship zsh-syntax-highlighting zsh-autosuggestions \
-  papirus-icon-theme fastfetch btop font-iosevka mangowc
-```
-
-JetBrains Mono and the Nerd Font symbols are not in that list. Check
-`xbps-query -Rs jetbrains` and `xbps-query -Rs nerd`, or put the Nerd Fonts
-release tarballs in `~/.local/share/fonts/`. Run `fc-cache -fv` afterwards.
 
 **Don't install:**
 
