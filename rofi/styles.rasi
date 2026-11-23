@@ -27,7 +27,7 @@ configuration {
 }
 
 * {
-  bg:          #1a1b26F2;
+  bg:          #1a1b26;
   bg-alt:      #1f2030;
   fg:          #c0caf5;
   muted:       #414868;
