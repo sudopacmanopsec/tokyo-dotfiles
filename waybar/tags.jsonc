@@ -1,0 +1,11 @@
+{
+  "custom/tag1": { "exec": "~/.config/waybar/scripts/tag.sh 1", "return-type": "json", "format": "{}", "interval": 1, "on-click": "mmsg dispatch view,1" },
+  "custom/tag2": { "exec": "~/.config/waybar/scripts/tag.sh 2", "return-type": "json", "format": "{}", "interval": 1, "on-click": "mmsg dispatch view,2" },
+  "custom/tag3": { "exec": "~/.config/waybar/scripts/tag.sh 3", "return-type": "json", "format": "{}", "interval": 1, "on-click": "mmsg dispatch view,3" },
+  "custom/tag4": { "exec": "~/.config/waybar/scripts/tag.sh 4", "return-type": "json", "format": "{}", "interval": 1, "on-click": "mmsg dispatch view,4" },
+  "custom/tag5": { "exec": "~/.config/waybar/scripts/tag.sh 5", "return-type": "json", "format": "{}", "interval": 1, "on-click": "mmsg dispatch view,5" },
+  "custom/tag6": { "exec": "~/.config/waybar/scripts/tag.sh 6", "return-type": "json", "format": "{}", "interval": 1, "on-click": "mmsg dispatch view,6" },
+  "custom/tag7": { "exec": "~/.config/waybar/scripts/tag.sh 7", "return-type": "json", "format": "{}", "interval": 1, "on-click": "mmsg dispatch view,7" },
+  "custom/tag8": { "exec": "~/.config/waybar/scripts/tag.sh 8", "return-type": "json", "format": "{}", "interval": 1, "on-click": "mmsg dispatch view,8" },
+  "custom/tag9": { "exec": "~/.config/waybar/scripts/tag.sh 9", "return-type": "json", "format": "{}", "interval": 1, "on-click": "mmsg dispatch view,9" }
+}
