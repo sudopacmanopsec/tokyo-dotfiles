@@ -23,6 +23,7 @@ mangowm + Tokyo Night. Waybar, mako, rofi, and foot, this is a personal repo, us
 | `rofi/`  | launcher (`styles.rasi`, scripts)     |
 
 double click left whats played on waybar for repeat, right click for next, middle click for previous, left click for pause, SUPER+scroll can change workspaces, ALT+\ allows for floating windows, etc. look into code for more info!
+also mv the keyview file and chmod +x it, update the autostart.conf with that path if needed
 
 ## Install
 
@@ -51,8 +52,8 @@ the manual `cp` line above. **Read "Before you install" first.**
 | pavucontrol             | volume click action                         |
 | PipeWire or PulseAudio  | provides `pactl` for the volume module      |
 | grim, slurp             | screenshots                                 |
-| keyview                 | keyview lol                                 |
-| zsh, starship           | shell and prompt                            |
+| gtk4 py3-gobject        | keyview lol                                 |
+| starship                | prompt                                      |
 | JetBrains Mono          | waybar and rofi                             |
 | Iosevka                 | foot                                        |
 | Nerd Font symbols       | icon glyphs in the bar, rofi and foot       |
