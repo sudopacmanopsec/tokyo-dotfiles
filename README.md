@@ -23,7 +23,7 @@ mangowm + Tokyo Night. Waybar, mako, rofi, and foot, this is a personal repo, us
 | `rofi/`  | launcher (`styles.rasi`, scripts)     |
 
 double click left whats played on waybar for repeat, right click for next, middle click for previous, left click for pause, SUPER+scroll can change workspaces, ALT+\ allows for floating windows, etc. look into code for more info!
-also mv the keyview file and chmod +x it, update the autostart.conf with that path if needed
+also mv the keyview file and chmod +x it, update the autostart.conf with that path if needed, keyview is a python script so nothing but gtk4, gtk4 layer shell, and python3-gobject needed
 
 ## Install
 
